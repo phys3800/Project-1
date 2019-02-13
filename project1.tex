@@ -1,0 +1,243 @@
+% project1.tex
+
+\documentclass{article}
+\usepackage{graphicx}
+% Package useful for including figures
+\title{P3800 Project 1: Numerical Differentiation and Integration}
+%\author{Your Friendly Neighbourhood Professors}
+\date{January 2019}
+\begin{document}
+   \maketitle
+
+
+\section{Latex}
+
+Just by getting to the point of being able to compile this document, you've come 
+quite a way!  The project reports for this course are to be
+typeset in Latex.  It's easy to make mistakes and things can get pretty
+frustrating, especially in the beginning.  But it's good for you!
+Most scientific writing for journal submissions (and books) is done using Latex.
+And once you get the hang of it, writing out equations is much faster
+than using other menu-driven typesetting programs.  You can quickly
+find documentation on the web for Latex.  One useful website is
+
+\begin{verbatim}
+http://en.wikibooks.org/wiki/LaTeX
+\end{verbatim}
+
+\section{Makefiles}
+
+It may be easy to keep track of compiling simple programs, e.g. with
+\begin{verbatim}
+gcc myprogram.c -o myprogram
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+gfortran myprogram.f90 -o myprogram
+\end{verbatim}
+But once there are many source files using different libraries and the compilation
+line gets a little busier, it helps to use makefiles to keep track of everything.
+The makefile also keeps track of what needs to be updated so that not all the source
+code needs to be compiled every time you make a change in one source file.
+
+You can read more about the command {\bf make} and makefiles at
+\begin{verbatim}
+http://www.gnu.org/software/make/manual/make.html
+\end{verbatim}
+
+or by typing
+\begin{verbatim}
+man make
+\end{verbatim}
+
+Also, having a makefile makes it easier for others (like people marking your assignments) to 
+compile your code.  For example, there
+is a file called {\it Makefile} in this directory that governs how a  piece of code called 
+{\it differentiate.f90} is compiled by the {\it make} utility.  Just type {\bf make differentiate} and the utility will use the contents of {\it Makefile}
+to produce the executable {\it differentiate}.  To run the compiled program, just type {\bf ./differentiate}.  If all is well, running the code should produce a file called a file called {\it diff\_results.dat}.
+
+\section{Numerical Differentiation}
+
+\subsection{Differentiating a known function}
+
+The program {\it differentiate.f90} calculates the derivative of 
+$\sin(x)$ at $x=1$~rad, using a forward difference and
+a central difference.  The program outputs the
+absolute error $\left| {\rm numerical \,\, result} - {\rm exact} \right|$ of the calculations as a function of 
+step size $h$ to a file called {\it diff\_results.dat}.  The results are graphed in Fig.~\ref{diff_results}.  The graphic 
+was produced using a program called {\bf Grace}, freely available for Unix-like systems.
+\begin{verbatim}
+http://plasma-gate.weizmann.ac.il/Grace/
+\end{verbatim}
+
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{diff_results}
+\caption{
+Absolute error as a function of step size $h$ for forward and central difference method
+in calculating the derivative of $\sin{x}$ at $x=1^r$.
+Note the minimum in the error.  Also note the slopes of the curves on the high
+side of the minimum.  The $O(h)$ method (forward difference, circles) has slope
+one in logarthmic units, while the
+$O(h^2)$ method (central difference, squares) has slope two.
+}
+\label{diff_results}
+\end{figure}
+
+You can recreate most of the the plot by typing
+
+\begin{verbatim}
+xmgrace -log xy -nxy diff_results.dat
+\end{verbatim}
+
+
+Note that depending on how the program was installed, it could be called  {\tt xmgr}.
+The {\tt -nxy} tells {\bf Grace} to use the first column in the data file as the $x$ values (horizontal axis),
+and all the other columns as different sets of $y$ values.  Otherwise, only the first two columns are
+plotted (the first on the horizontal, the second on the vertical).  The {\tt -log xy} tells {\bf Grace} to use logarthmic scaling for the $x$ and $y$ axes. 
+By double clicking on the graph in the {\bf Grace} window, you will get a menu of options for 
+plotting symbols.  By double clicking near an axis, you can add a title to that axis, play with tick marks
+and labels, etc.  You can also
+access these features through the various menus.  To generate an {\tt eps} (encapsulated postscript) file
+used by Latex for making figures, select {\tt Print setup} from the {\tt File} menu.  There, choose {\tt eps}
+from the {\tt Device} list and choose an appropriate name for the file (default is usually okay).  Then, when you
+print ({\tt Print} from the {\tt File} menu), an {\tt eps} file will be generated.
+\\
+
+
+
+
+{\bf TASK \#1:}  Modify {\it differentiate.f} so that it calculates the derivative of 
+$\sin(x)$ at $x=1$~rad using the fourth order method
+shown in class
+$$
+f^\prime(x) = \frac{1}{12h} \left( f[x-2h] - 8f[x-h] + 8f[x+h] - f[x+2h] \right) + \mathcal{O}(h^4).
+$$
+%, equation 5.10 on page 39, noting the comments on page 40.  
+Plot the results together with those already shown in Fig.~\ref{diff_results}.  
+In the main body of your report, {\bf briefly} discuss your results. In particular, comment on the minimum errors
+attained for the different methods, and the values of $h$ at which they occur.   Do the results match 
+theoretical estimates obtained in class?
+
+\subsection{Differentiating data}
+
+In the project directory, you should also find a file called {\it experiment.dat}.  Column 1 is the temperature $T$
+(on the Kelvin scale), while column 2 reports a dimensionless quantity $s$ related to the sound velocity
+in the compound UNi$_2$Si$_2$.  Phase transitions are marked by sudden changes in the derivative of 
+$s$ with respect to $T$.  The data are not equally spaced in $T$.
+
+In general, for a function $f(x)$ sampled at a set of (unequally) spaced points, the derivative is
+$$
+f'_i=\frac{h^2_{i-1} f_{i+1}+(h^2_i-h^2_{i-1})f_i-h^2_i f_{i-1}}{h_i h_{i-1} (h_i+h_{i-1})}
++O(h^2),
+$$
+where $f_i=f(x_i)$, $h_i=x_{i+1}-x_i$ and $h$ is the larger of $h_i$ and $h_{i-1}$.
+\\
+
+{\bf TASK \#2}
+Write a program that uses the above formula to calculate the slope $\frac{d s}{dT}$.  Plot your 
+result.  Ignoring the initial noise at $T$ near zero, how many phase transitions do you see? 
+
+\section{Numerical Integration}
+
+In the study of blackbody radiation, there is a result, Stefan's Law, that states that the power
+emitted from a perfect blackbody per unit area is
+$$
+j=\sigma T^4,
+$$
+where $T$ is the absolute temperature and $\sigma$ is a constant that can be expressed as,
+$$
+\sigma = \frac{2 \pi k^4}{c^2 h^3} \int_0^\infty {\rm d}u \frac{u^3}{e^u -1}.
+$$
+It turns out that the integral in the above expression can be done analytically, and has a value of $\pi^4/15$.
+\\
+
+{\bf TASK \#3:}
+As an exercise in numerical integration, calculate the integral
+$$
+\int_0^\infty {\rm d}u \frac{u^3}{e^u -1},
+$$
+using Gauss-Laguerre integration (see handout from Klein and Gordan).
+The parameters for $N=2$, 4, 8, 16 \dots 32 are provided in the
+files labelled {\it weights.dat\_N}.  These files were obtained from the website quoted in the book.
+Check the website to see what the columns of the files are.
+Report the absolute value of the relative error, 
+(exact - num val)/exact,
+as a function of $N$ in a table.  Look at Table~\ref{tab1} as a template.  
+Also, make a plot of the value of the integral as a function of the order.  {\bf Briefly} discuss the results.  
+Note that the parameters are given to 12 digits of precision, while a double precision real 
+number generally has 14 decimal digits of precision.
+
+The program {\it integrate.f90} provides a start. 
+Compile the code by typing 
+%begin{verbatim}
+{\bf make integrate}.
+%\end{verbatim}
+Examine the program source
+code as well as the script {\it run\_integrate.sh} to figure out how you might obtain 
+the required table of values.  The shell script {\it run\_integrate2.sh} is an alternate 
+script that accomplishes the same task but in a slightly different way.  To run a script, just type
+{\bf ./run\_integrate2.sh}.  When writing your own script, make sure to change permissions to 
+make it executable.
+\\
+
+{\bf TASK \#4:}
+Write your own program to evaluate the integral using Simpson's rule.  
+When writing your code, define a separate function for your integrand.  This will enable you and others to 
+easily modify your code to integrate some other function.
+One difficulty in using Simpson's rule is that you can not
+integrate out to infinity, but rather must choose an
+upper limit to the integral.  The value of the integral should be insensitive to
+within desired precision to the upper limit of integration, i.e., once the upper limit is large enough,
+making it larger won't change the value of your answer.  Part of your task, therefore, is to explore
+how using Simpson's rule for the integral at hand depends on step size and this upper limit of integration.
+
+Concretely, carry out the integral 
+$$
+\int_0^x  {\rm d}u \frac{u^3}{e^u -1},
+$$
+using $n=11$, 101, 1001, $10^4+1$, $10^5+1$, $10^6+1$, and $10^7+1$ points at which to evaluate the integrand 
+(remembering that Simpson's rule requires an odd number of points), for $x=10$, 100, 1000 and 10000.
+Your program, or program/script combination, should produce four data files, each containing absolute relative error as a function of
+$n$ for a given $x$.  Using {\bf grace}, plot the four curves use logarithmic axes.
+{\bf Briefly} discuss your results and compare them to 
+the Gauss-Laguerre method.
+\\ 
+
+%{\bf TASK \#5:}
+%You should be curious as to how {\it Mathematica} handles the integral, both 
+%analytically and numerically.  Try it, and briefly report on what you get.
+
+\begin{table}
+\begin{tabular}{|c|c|c|}
+\hline
+Order & value of integral & relative error \\
+\hline
+2 &  818 &  h\\
+4 &  2.319556 & e \\
+8 & 704 & l\\
+16 & 46 & l\\
+20 & 0 &  o \\
+24 & 0 & o \\
+28 & 0 & o \\
+32 & 35 & o\\
+\hline
+\end{tabular}
+\caption{
+Sample table.  Use this table as a template to report the values of the integral to be done using
+Gauss-Laguerre integration, as well as the absolute relative error.}
+\label{tab1}
+\end{table}
+
+\section{YOUR SUBMISSION}
+
+You need to submit a hardcopy of your report that includes graphs, tables and discussion related to 
+each task.  All tasks carry the same weight for marking purposes.
+
+Please submit all relevant source code, scripts, latex, eps and pdf files electronically as shown in class. We should be able to simply type {\bf latex project1.tex} to reproduce your report.  {\bf Please write and  
+include a script called {\it run\_project1.sh}, which when run should compile and run code and output any relevant data to the screen. } Use the {\it run\_project1.sh} provided as a template if you wish.  The idea is that by running {\it run\_project1.sh}, we should quickly see that all your code compiles, that it produces meaningful output, and whether your numbers are right.  
+
+
+\end{document}
